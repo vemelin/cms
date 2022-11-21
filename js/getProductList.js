@@ -25,7 +25,6 @@ export class getProductList {
     this.#popUpSetUp();
   }
   #render() {
-    const {placeholder} = this.options;
     //Hide popup
     const modalOverlay = document.querySelector('.overlay');
       modalOverlay.classList.toggle('active');
@@ -37,9 +36,11 @@ export class getProductList {
   }
   #popUpSetUp(){
     this.clickHanlder = this.clickHanlder.bind(this);
-    document.body.querySelector('.panel__add-goods')
-    .addEventListener('click', this.clickHanlder);
-    document.body.querySelector('.modal__close')
+    // document.body.querySelector('.panel__add-goods')
+    // .addEventListener('click', this.clickHanlder);
+    // document.body.querySelector('.modal__close')
+    // .addEventListener('click', this.clickHanlder);
+    document.querySelector('body')
     .addEventListener('click', this.clickHanlder);
   }
   clickHanlder(event) {
@@ -47,7 +48,7 @@ export class getProductList {
     if(type === 'submit') {
       this.toggle();
     }
-    if(event.target.matches('path') || 
+    if(event.target.matches('path') ||
         event.target.matches('svg')) {
       const btn = document.querySelector('.overlay')
       .classList.toggle('active');
