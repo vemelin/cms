@@ -17,7 +17,7 @@ const createRow = (inc, product) => {
             </td>
           </tr>`
 }
-export class getProductList {
+export class GetProductList {
   constructor(selector, options) {
     this.$el = document.querySelector(selector);
     this.options = options;

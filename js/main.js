@@ -1,6 +1,6 @@
 'use strict';
-import {getProductList} from './getProductList.js';
-const products = new getProductList('.table__body', {
+import {GetProductList} from './GetProductList.js';
+const products = new GetProductList('.table__body', {
 });
 
 {
