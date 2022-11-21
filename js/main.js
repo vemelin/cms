@@ -1,4 +1,8 @@
-'use stript';
+'use strict';
+import {getProductList} from './getProductList.js';
+const products = new getProductList('.table__body', {
+});
+
 {
   const modalHeader = document.querySelectorAll('.modal__title'),
     modalForm = document.querySelectorAll('.modal__fieldset'),
