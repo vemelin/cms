@@ -36,10 +36,6 @@ export class getProductList {
   }
   #popUpSetUp(){
     this.clickHanlder = this.clickHanlder.bind(this);
-    // document.body.querySelector('.panel__add-goods')
-    // .addEventListener('click', this.clickHanlder);
-    // document.body.querySelector('.modal__close')
-    // .addEventListener('click', this.clickHanlder);
     document.querySelector('body')
     .addEventListener('click', this.clickHanlder);
   }
