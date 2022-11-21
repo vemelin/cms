@@ -29,7 +29,7 @@ export class getProductList {
     //Hide popup
     const modalOverlay = document.querySelector('.overlay');
       modalOverlay.classList.toggle('active');
-    //Rewrite rows and wrap up within new data from JSON
+    //Rewriting rows and pull them up from the new JSON data
     this.$el.innerText = '';
     products.forEach((product, index) => {
       this.$el.insertAdjacentHTML('beforebegin',createRow(index, product))
