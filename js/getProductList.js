@@ -42,6 +42,13 @@ export class GetProductList {
         popup.classList.add('active');
       } if (target.matches('.overlay') || target.closest('.modal__close')) {
         popup.classList.remove('active');
+      } if (target.matches('.table__btn_del')) {
+        const productList = target.closest('tr');
+        const productID = +productList.querySelector('.table__cell-id').parentElement.dataset.id;
+        const DBIndex = products.findIndex(goods => goods.id === productID);
+        if (DBIndex >= 0) products.splice(DBIndex, 1);
+        productList.remove();
+        console.table('Storage: ', products);
       }
     });
   }
