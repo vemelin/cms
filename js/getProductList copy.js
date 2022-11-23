@@ -22,7 +22,7 @@ export class GetProductList {
     this.$el = document.querySelector(selector);
     this.options = options;
     this.#render();
-    this.addProductModal();
+    this.#popUpSetUp();
   }
   #render() {
     //Hide popup
@@ -34,15 +34,37 @@ export class GetProductList {
       this.$el.insertAdjacentHTML('beforebegin',createRow(index, product))
     });
   }
-  addProductModal(){
-    document.addEventListener('click', e => {
-      const popup = document.querySelector('.overlay');
-      let target = e.target;
-      if (target.matches('.panel__add-goods')) {
-        popup.classList.add('active');
-      } if (target.matches('.overlay') || target.closest('.modal__close')) {
-        popup.classList.remove('active');
-      }
-    });
+  #popUpSetUp(){
+    this.clickHanlder = this.clickHanlder.bind(this);
+    document.querySelector('body')
+    .addEventListener('click', this.clickHanlder);
+  }
+  clickHanlder(event) {
+    const {type} = event.target;
+    if(type === 'submit') {
+      this.toggle();
+    }
+    if(event.target.matches('path') ||
+        event.target.matches('svg')) {
+      const btn = document.querySelector('.overlay')
+      .classList.toggle('active');
+    }
+  }
+  get popUpIsOpen() {
+    const btn = document.body.classList.contains('active');
+    return btn ?? overlay;
+  }
+  toggle() {
+    this.popUpIsOpen ? this.close() : this.open();
+  }
+  open() {
+    document.querySelector('.overlay').classList.add('active');
+  }
+  close() {
+    document.querySelector('.overlay').classList.remove('active');
+  }
+  clear() {
+    document.body.querySelector('.panel__add-goods')
+    .removeEventListener('click', this.clickHanlder);
   }
 }
