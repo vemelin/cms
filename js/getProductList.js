@@ -35,6 +35,15 @@ export class GetProductList {
     return reflectTotalAmount.innerText = `$ ${totalAmount}`;
   }  
   #render() {
+    // const lastElement = + Object.keys(products)[Object.keys(products).length-1] + 1;
+    // console.log(this.productDB[3].id = 'test');
+    // console.log(this.productDB);
+    // console.log(lastElement);
+    // const { id } = this.productDB;
+    // this.productDB.push({id: 'test'});
+    // console.log(this.productDB);
+    // console.log(id);
+
     //Hide popup
     const modalOverlay = document.querySelector('.overlay');
       modalOverlay.classList.toggle('active');
@@ -61,76 +70,63 @@ export class GetProductList {
   clearDiscountField(){
     const checkbox = document.querySelector('.modal__checkbox');
     const discount = document.querySelector('.modal__input_discount');
-    discount.disabled = checkbox.checked ? false : true;
+    discount.disabled = !checkbox.checked;
     if (!discount.disabled) {
-      // discount.focus();
     } if (!checkbox.checked) {
       discount.value = '';
     }
   }
-  formValidataion() {
+  setFormFieldType() {
     const form = document.querySelector('.modal__form');
     for (const option of Array(...form)) {
       if (option.type !== 'checkbox' && option.type !== 'file') {
         option.required = true;
       }
     }
-    form.discount_count.type = 'number';
+    form.discount.type = 'number';
     form.elements.count.type = 'number';
     form.elements.price.type = 'number';
   }
   openModal() {
     const form = document.querySelector('.modal__form');
+    const popup = document.querySelector('.overlay');
     document.addEventListener('click', e => {            
-      this.formValidataion();
-      const popup = document.querySelector('.overlay');
-      let target = e.target;
-      if (target.matches('.panel__add-goods')) {
+      const popupAmount = document.querySelector('.modal__total-price');
+      this.clearDiscountField();
+      this.setFormFieldType();
+      if (e.target.matches('.panel__add-goods')) {
         popup.classList.add('active');
-      } if (target.matches('.overlay') || target.closest('.modal__close')) {
+      } if (e.target.matches('.overlay') || e.target.closest('.modal__close')) {
         popup.classList.remove('active');
       }
-      this.clearDiscountField(target);
-      const discount = document.querySelector('.modal__input_discount');
-      const popupAmount = document.querySelector('.modal__total-price');
-      if(target.type === 'number') {
+      if(e.target.type === 'number') {
         document.addEventListener('mouseup', () => {
-          const dis = form.discount_count;
+          const dis = form.discount;
           const qty = form.count;
           const price = form.price;
           const totalAmount = Math.floor(qty.value * price.value  * (1 - dis.value/100));
-          popupAmount.textContent = `$ ${totalAmount}`;
+          popupAmount.textContent = `$ ${totalAmount}.00`;
         })
-      } if (target.matches('.modal__submit') && price.value > 0) {
+      } if (e.target.matches('.modal__submit') && price.value > 0) {
         popup.classList.remove('active');
       }
     });
   }
   addProduct() {
     const form = document.querySelector('.modal__form');
-    const randomID = Math.floor(Math.random(1) * 10000);
+    const randomID = Math.floor(Math.random(1) * Date.now());
+    // const idElem = document.querySelector('.vendor-code__id');
+    // idElem.textContent = randomID;
     form.addEventListener('submit', e => {
       e.preventDefault();
-      let target = e.target;
-      const getFromForm = {
-        id: randomID,
-        title: form.name.value,
-        price: form.price.value,
-        description: form.description.value,
-        category: form.category.value,
-        discount: form.discount.value,
-        count: form.count.value,
-        units: 'шт',
-        image: {
-          "small": `img/${randomID}.jpg`,
-          "big": `img/${randomID}.jpg`,
-        }
-      }
-      console.log(this.productDB);
-      this.productDB.push(getFromForm);
+      const formData = new FormData(e.target);
+      const currentID = this.productDB.length;
+      const addNewItem = Object.fromEntries(formData);
+      addNewItem.id = randomID;
+      this.productDB.push(addNewItem);
       console.log(this.productDB);
       const inc = products.length - 1;
-      this.$el.insertAdjacentHTML('beforebegin',createRow(inc, getFromForm))
+      this.$el.insertAdjacentHTML('beforebegin',createRow(inc, addNewItem))
       form.reset();
       this.totalAmount();
     });
