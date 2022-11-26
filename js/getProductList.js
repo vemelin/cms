@@ -35,16 +35,6 @@ export class GetProductList {
     return reflectTotalAmount.innerText = `$ ${totalAmount}`;
   }  
   #render() {
-    // const lastElement = + Object.keys(products)[Object.keys(products).length-1] + 1;
-    // console.log(this.productDB[3].id = 'test');
-    // console.log(this.productDB);
-    // console.log(lastElement);
-    // const { id } = this.productDB;
-    // this.productDB.push({id: 'test'});
-    // console.log(this.productDB);
-    // console.log(id);
-
-    //Hide popup
     const modalOverlay = document.querySelector('.overlay');
       modalOverlay.classList.toggle('active');
     //Rewriting rows and pull them up from the new JSON data
@@ -115,8 +105,6 @@ export class GetProductList {
   addProduct() {
     const form = document.querySelector('.modal__form');
     const randomID = Math.floor(Math.random(1) * Date.now());
-    // const idElem = document.querySelector('.vendor-code__id');
-    // idElem.textContent = randomID;
     form.addEventListener('submit', e => {
       e.preventDefault();
       const formData = new FormData(e.target);
