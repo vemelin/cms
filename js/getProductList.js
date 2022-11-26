@@ -27,6 +27,13 @@ export class GetProductList {
     this.addProduct();
     this.removeProduct();
     this.totalAmount();
+    this.sessionStorage();
+  }
+  sessionStorage(){
+    sessionStorage.setItem('test', '123');
+    localStorage.setItem('test2', '12345');
+    localStorage.setItem('test2', '123456');
+    localStorage.setItem('test2', '123457');
   }
   totalAmount() {
     const reflectTotalAmount = document.querySelector('.cms__total-price');
@@ -90,7 +97,7 @@ export class GetProductList {
         popup.classList.remove('active');
       }
       if(e.target.type === 'number') {
-        document.addEventListener('mouseup', () => {
+        document.addEventListener('change', () => {
           const dis = form.discount;
           const qty = form.count;
           const price = form.price;
