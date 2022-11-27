@@ -34,6 +34,21 @@ export class GetProductList {
     localStorage.setItem('test2', '12345');
     localStorage.setItem('test2', '123456');
     localStorage.setItem('test2', '123457');
+    const test = {
+      a: 1,
+      b: 2,
+      c: 5,
+      d: {
+        e: 6,
+        f: 7
+      }
+    }
+    localStorage.setItem('test2', JSON.stringify(test));
+    const getStorageData = localStorage.getItem('test2');
+    console.log('getStorageDatae: ', JSON.parse(getStorageData));
+    window.addEventListener('storage', e => {
+      console.log(e);
+    })
   }
   totalAmount() {
     const reflectTotalAmount = document.querySelector('.cms__total-price');
