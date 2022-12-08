@@ -93,8 +93,8 @@ export class View {
           return open(url, title, 'width='+width+', height='+height+', top='+top+', left='+left);
         };
   
-        const newTab = popupWindow(url, title, 800, 600);
-        newTab.document.body.innerHTML = `
+        const newWindow = popupWindow(url, title, 800, 600);
+        newWindow.document.body.innerHTML = `
           <img src="${url}" alt="image alt text goes here">
         `;
       })
