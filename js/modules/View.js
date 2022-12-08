@@ -6,6 +6,7 @@ export class View {
     this.render();
     this.openModal();
     this.addProduct();
+    this.openProductGallery();
   }
   render() {
     const modalOverlay = document.querySelector('.overlay');
@@ -14,7 +15,7 @@ export class View {
     this.$el.innerText = '';
     this.products.forEach((product, index) => {
       const inc = this.products.length - 1;
-      this.$el.insertAdjacentHTML('beforebegin',this.createRow(index, product))
+      this.$el.insertAdjacentHTML('beforeend',this.createRow(index, product))
     });
   }
   createRow = (inc, product) => {
@@ -29,7 +30,7 @@ export class View {
       <td class="table__cell">$${product.price}</td>
       <td class="table__cell">$${product.count * product.price}</td>
       <td class="table__cell table__cell_btn-wrapper">
-        <button class="table__btn table__btn_pic"></button>
+        <button id="previewImage" class="table__btn table__btn_pic" data-pic="/img/photo_2022-03-30_14-57-05.jpg"></button>
         <button class="table__btn table__btn_edit"></button>
         <button class="table__btn table__btn_del"></button>
       </td>
@@ -68,14 +69,35 @@ export class View {
       const formData = new FormData(e.target);
       const currentID = this.products.length;
       const addNewItem = Object.fromEntries(formData);
+      // console.log(addNewItem.image.name);
       addNewItem.id = randomID;
       this.products.push(addNewItem);
       console.log(this.products);
       const inc = this.products.length - 1;
-      this.$el.insertAdjacentHTML('beforebegin',this.createRow(inc, addNewItem))
+      this.$el.insertAdjacentHTML('beforeend',this.createRow(inc, addNewItem))
       form.reset();
       this.controller.totalAmount();
     });
   }
-
+  openProductGallery() {
+    const previewImage = document.querySelectorAll('#previewImage');
+    previewImage.forEach(el => {
+      el.addEventListener('click', e => {
+      
+        const url = e.target.dataset.pic;
+        const title = document.querySelector('.table__cell_name').textContent;
+  
+        const popupWindow = (url, title, width, height) => {
+          const left = (screen.width/2)-(width/2);
+          const top = (screen.height/2)-(height/2);
+          return open(url, title, 'width='+width+', height='+height+', top='+top+', left='+left);
+        };
+  
+        const newTab = popupWindow(url, title, 800, 600);
+        newTab.document.body.innerHTML = `
+          <img src="${url}" alt="image alt text goes here">
+        `;
+      })
+    });
+  }
 }
