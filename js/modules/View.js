@@ -4,9 +4,9 @@ export class View {
     this.controller = select.controller;
     this.products = select.model.data;
     this.render();
+    this.openProductGallery('#previewImage');
     this.openModal();
     this.addProduct();
-    this.openProductGallery();
   }
   render() {
     const modalOverlay = document.querySelector('.overlay');
@@ -77,10 +77,11 @@ export class View {
       this.$el.insertAdjacentHTML('beforeend',this.createRow(inc, addNewItem))
       form.reset();
       this.controller.totalAmount();
+      this.openProductGallery('#previewImage');
     });
   }
-  openProductGallery() {
-    const previewImage = document.querySelectorAll('#previewImage');
+  openProductGallery(selector) {
+    const previewImage = document.querySelectorAll(selector);
     previewImage.forEach(el => {
       el.addEventListener('click', e => {
       
@@ -94,7 +95,7 @@ export class View {
         };
   
         const newWindow = popupWindow(url, title, 800, 600);
-        newWindow.document.body.innerHTML = `
+        return newWindow.document.body.innerHTML = `
           <img src="${url}" alt="image alt text goes here">
         `;
       })
