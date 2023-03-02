@@ -14,19 +14,33 @@ export class View {
       modalOverlay.classList.toggle('active');
     //Rewriting rows and pull them up from the new JSON data
     this.$el.innerText = '';
-    
+
     // Pull data from the CMS github project
     this.model.list().then(data => {
         data.map((el, i) => {
           this.$el.insertAdjacentHTML('beforeend',this.createRow(i, el))
         });
-      })
-    
+        
+        // Render Rows Controls
+        const cta = document.querySelectorAll('.table__body tr');
+        cta.forEach(el => {
+          el.addEventListener('click', e => {
+            if(e.target.matches('.table__btn_edit')) {
+            }
+          })
+        });
+
+      });
     // this.products.forEach((product, index) => {
     //   const inc = this.products.length - 1;
     //   this.$el.insertAdjacentHTML('beforeend',this.createRow(index, product))
     // });
   }
+  rowControls() {
+    const cta = document.querySelectorAll('.table__body tr');
+    return cta;
+  }
+
   createRow = (inc, product) => {
     return `<tr>
       <td class="table__cell inc">${++inc}</td>

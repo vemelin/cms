@@ -1,14 +1,14 @@
-import data from '../goods.json' assert {type: 'json'};
+import data from "../goods.json" assert { type: "json" };
+
 export class Model {
   constructor(selector) {
     this.model = selector;
     this.data = data;
   }
-  list = async () => {
-    return await (
-        await fetch(`https://cms-yyk5.onrender.com/api/goods`)
-      ).json();
-  }
+
+  list = async () =>
+    await (await fetch(`https://cms-yyk5.onrender.com/api/goods`)).json();
+
   // dataList() {
   //   const url = `https://cms-yyk5.onrender.com/api/goods`;
   //   const data = fetch(url)
