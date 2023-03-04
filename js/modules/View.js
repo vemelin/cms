@@ -15,20 +15,42 @@ export class View {
     //Rewriting rows and pull them up from the new JSON data
     this.$el.innerText = '';
 
+    // Spinner
+    const spinner = document.createElement('div');
+    const table = document.querySelector('.goods__table-wrapper');
+    spinner.style.cssText = `
+    width 100%;
+    margin: auto 0;
+    padding: 50px 0;
+    text-align: center;
+    `;
+    spinner.innerHTML = `
+    <svg width="24" height="24" stroke="#000" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_V8m1{transform-origin:center;animation:spinner_zKoa 2s linear infinite}.spinner_V8m1 circle{stroke-linecap:round;animation:spinner_YpZS 1.5s ease-in-out infinite}@keyframes spinner_zKoa{100%{transform:rotate(360deg)}}@keyframes spinner_YpZS{0%{stroke-dasharray:0 150;stroke-dashoffset:0}47.5%{stroke-dasharray:42 150;stroke-dashoffset:-16}95%,100%{stroke-dasharray:42 150;stroke-dashoffset:-59}}</style><g class="spinner_V8m1"><circle cx="12" cy="12" r="9.5" fill="none" stroke-width="3"></circle></g></svg>
+    `;
+    
+    table.append(spinner);
+    const loadinTextPlaceholder = document.createElement('p');
+    loadinTextPlaceholder.textContent = `Подождтите идет загрузка данных`
+    spinner.append(loadinTextPlaceholder)
+
     // Pull data from the CMS github project
     this.model.list().then(data => {
-        data.map((el, i) => {
-          this.$el.insertAdjacentHTML('beforeend',this.createRow(i, el))
-        });
-        
-        // Render Rows Controls
-        const cta = document.querySelectorAll('.table__body tr');
-        cta.forEach(el => {
-          el.addEventListener('click', e => {
-            if(e.target.matches('.table__btn_edit')) {
-            }
-          })
-        });
+
+      if (data.length > 0) spinner.remove();
+
+      data.map((el, i) => {
+        this.$el.insertAdjacentHTML('beforeend',this.createRow(i, el))
+      });
+
+      // Render Rows Controls
+      const cta = document.querySelectorAll('.table__body tr');
+      cta.forEach(el => {
+        el.addEventListener('click', e => {
+          if(e.target.matches('.table__btn_edit')) {
+            this.openModal(data)
+          }
+        })
+      });
 
       });
     // this.products.forEach((product, index) => {
@@ -53,7 +75,7 @@ export class View {
       <td class="table__cell">$${product.price}</td>
       <td class="table__cell">$${product.count * product.price}</td>
       <td class="table__cell table__cell_btn-wrapper">
-        <button id="previewImage" class="table__btn table__btn_pic" data-pic="/img/photo_2022-03-30_14-57-05.jpg"></button>
+        <button id="previewImage" class="table__btn table__btn_pic" data-pic="=${product.image}"></button>
         <button class="table__btn table__btn_edit"></button>
         <button class="table__btn table__btn_del"></button>
       </td>
@@ -70,7 +92,7 @@ export class View {
     reader.readAsDataURL(file);
   })
 
-  openModal() {
+  openModal(data) {
     const form = document.querySelector('.modal__form');
     const popup = document.querySelector('.overlay');
     const modal = document.querySelector('.overlay__modal');
@@ -148,16 +170,16 @@ export class View {
     const previewImage = document.querySelectorAll(selector);
     previewImage.forEach(el => {
       el.addEventListener('click', e => {
-        // const url = e.target.dataset.pic;
+        const url = e.target.dataset.pic;
         const title = document.querySelector('.table__cell_name').textContent;
         const popupWindow = (url, title, width, height) => {
           const left = (screen.width/2)-(width/2);
           const top = (screen.height/2)-(height/2);
           return open(url, title, 'width='+width+', height='+height+', top='+top+', left='+left);
         };
-        const newWindow = popupWindow(src, title, 800, 600);
+        const newWindow = popupWindow(url, title, 800, 600);
         return newWindow.document.body.innerHTML = `
-          <img src="${src}" alt="image alt text goes here">
+          <img src="${url}" alt="image alt text goes here">
         `;
       })
     });
