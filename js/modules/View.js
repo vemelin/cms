@@ -5,9 +5,10 @@ export class View {
     this.products = select.model.data;
     this.model = select.model;
     this.render();
-    this.openProductGallery('#previewImage');
-    this.openModal();
-    this.addProduct();
+    this.controller.openProductGallery('#previewImage');
+    // this.controller.openModal();
+    // this.openModal();
+    this.controller.addProduct(this.$el, this.createRow);
   }
   render() {
     const modalOverlay = document.querySelector('.overlay');
@@ -19,10 +20,10 @@ export class View {
     const spinner = document.createElement('div');
     const table = document.querySelector('.goods__table-wrapper');
     spinner.style.cssText = `
-    width 100%;
-    margin: auto 0;
-    padding: 50px 0;
-    text-align: center;
+      width 100%;
+      margin: auto 0;
+      padding: 50px 0;
+      text-align: center;
     `;
     spinner.innerHTML = `
     <svg width="24" height="24" stroke="#000" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_V8m1{transform-origin:center;animation:spinner_zKoa 2s linear infinite}.spinner_V8m1 circle{stroke-linecap:round;animation:spinner_YpZS 1.5s ease-in-out infinite}@keyframes spinner_zKoa{100%{transform:rotate(360deg)}}@keyframes spinner_YpZS{0%{stroke-dasharray:0 150;stroke-dashoffset:0}47.5%{stroke-dasharray:42 150;stroke-dashoffset:-16}95%,100%{stroke-dasharray:42 150;stroke-dashoffset:-59}}</style><g class="spinner_V8m1"><circle cx="12" cy="12" r="9.5" fill="none" stroke-width="3"></circle></g></svg>
@@ -30,7 +31,7 @@ export class View {
     
     table.append(spinner);
     const loadinTextPlaceholder = document.createElement('p');
-    loadinTextPlaceholder.textContent = `Подождтите идет загрузка данных`
+    loadinTextPlaceholder.textContent = `Подождите идет загрузка данных`
     spinner.append(loadinTextPlaceholder)
 
     // Pull data from the CMS github project
@@ -46,23 +47,22 @@ export class View {
       const cta = document.querySelectorAll('.table__body tr');
       cta.forEach(el => {
         el.addEventListener('click', e => {
+          if(e.target.closest('tr')) {
+            // console.log(e.target.classList);
+            // .classList('vendor-code__id')
+          }
           if(e.target.matches('.table__btn_edit')) {
-            this.openModal(data)
+            this.controller.editProduct(e);
           }
         })
       });
 
-      });
+      }).catch(err => console.warn(`Grid Data Error: `, err));
     // this.products.forEach((product, index) => {
     //   const inc = this.products.length - 1;
     //   this.$el.insertAdjacentHTML('beforeend',this.createRow(index, product))
     // });
   }
-  rowControls() {
-    const cta = document.querySelectorAll('.table__body tr');
-    return cta;
-  }
-
   createRow = (inc, product) => {
     return `<tr>
       <td class="table__cell inc">${++inc}</td>
@@ -80,108 +80,5 @@ export class View {
         <button class="table__btn table__btn_del"></button>
       </td>
     </tr>`
-  }
-  toBase64 = file => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.addEventListener('loadend', () => {
-      resolve(reader.result);
-    });
-    reader.addEventListener('error', err => {
-      reject(err);
-    });
-    reader.readAsDataURL(file);
-  })
-
-  openModal(data) {
-    const form = document.querySelector('.modal__form');
-    const popup = document.querySelector('.overlay');
-    const modal = document.querySelector('.overlay__modal');
-
-    document.addEventListener('click', e => {            
-      const popupAmount = document.querySelector('.modal__total-price');
-      this.controller.clearDiscountField();
-      this.controller.setFormFieldType();
-      if (e.target.matches('.panel__add-goods')) {
-        popup.classList.add('active');
-      } if (e.target.matches('.overlay') || e.target.closest('.modal__close')) {
-        popup.classList.remove('active');
-      }
-      if(e.target.type === 'number') {
-        document.addEventListener('change', () => {
-          const dis = form.discount;
-          const qty = form.count;
-          const price = form.price;
-          const totalAmount = Math.floor(qty.value * price.value  * (1 - dis.value/100));
-          popupAmount.textContent = `$ ${totalAmount}.00`;
-        })
-      } if (e.target.matches('.modal__submit') && price.value > 0) {
-        popup.classList.remove('active');
-      }
-    });
-
-    // Attach / Render Image
-    const file = document.querySelector('.modal__file');
-    const preview = document.createElement('img');
-    document.body.append(preview)
-
-    file.addEventListener('change', async () => {
-      if(file.files[0].size > 1024 * 1024) {
-        return console.log(`The image is biggern then 1 Mb`);
-      }
-      if(file.files.length > 0) {
-        const src = URL.createObjectURL(file.files[0]);
-        preview.src = src;
-        preview.style.display = 'block';
-        const res = await this.toBase64(file.files[0]);
-      }
-    });
-    
-  }
-
-  addProduct() {
-    const form = document.querySelector('.modal__form');
-    const randomID = Math.floor(Math.random(1) * Date.now());
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();      
-      const formData = new FormData(e.target);
-      const currentID = this.products.length;
-      const addNewItem = Object.fromEntries(formData);
-      addNewItem.id = randomID;
-      
-      // Add Image
-      addNewItem.image = await this.toBase64(addNewItem.image);
-      // const img = document.createElement('img');
-      // img.src = addNewItem.image;
-      // document.body.append(img);
-    
-
-      this.products.push(addNewItem);
-      console.log(this.products);
-      
-      const inc = this.products.length - 1;
-      this.$el.insertAdjacentHTML('beforeend',this.createRow(inc, addNewItem))
-      form.reset();
-      this.controller.totalAmount();
-      this.openProductGallery('#previewImage', addNewItem.image);
-    });
-  }
-
-  openProductGallery(selector, src) {
-    const previewImage = document.querySelectorAll(selector);
-    previewImage.forEach(el => {
-      el.addEventListener('click', e => {
-        const url = e.target.dataset.pic;
-        const title = document.querySelector('.table__cell_name').textContent;
-        const popupWindow = (url, title, width, height) => {
-          const left = (screen.width/2)-(width/2);
-          const top = (screen.height/2)-(height/2);
-          return open(url, title, 'width='+width+', height='+height+', top='+top+', left='+left);
-        };
-        const newWindow = popupWindow(url, title, 800, 600);
-        return newWindow.document.body.innerHTML = `
-          <img src="${url}" alt="image alt text goes here">
-        `;
-      })
-    });
   }
 }
