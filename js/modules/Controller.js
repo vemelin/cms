@@ -145,6 +145,10 @@ export class Controller {
     
     if (e.target.matches('.table__btn_edit')) popup.classList.add('active');
 
+    //Change text from add product to save
+    const modalBtn = document.querySelector('.modal__submit');
+    modalBtn.textContent = 'Сохранить Товар';
+
     // Preview Image
     const fieldset = document.querySelector('.modal__fieldset')
     const preview = document.createElement('img');
@@ -170,6 +174,13 @@ export class Controller {
       }
     });
 
+    document.addEventListener('keyup', e => {
+      if (e.key === "Escape") {
+        postImgView.remove();
+        popup.classList.remove('active');
+      }
+    });
+
     { // Identify the data by ID and pull up the data
       if(data && id) {
         data.map(el => {
@@ -177,6 +188,9 @@ export class Controller {
             fieldset.elements.title.value = el.title;
             fieldset.elements.category.value = el.category;
             fieldset.elements.units.value = el.units;
+            if(el.discount) {
+              document.querySelector('.modal__checkbox').checked = true;
+            }
             fieldset.elements.discount.value = el.discount;
             fieldset.elements.description.value = el.description;
             fieldset.elements.price.value = el.price;
