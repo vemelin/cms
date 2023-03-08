@@ -5,6 +5,7 @@ export class Controller {
     this.model = options.model;
     this.totalAmount();
     this.removeProduct();
+    // this.formData()
   }
   newInc(target){
     let inc = 0;
@@ -45,9 +46,7 @@ export class Controller {
       .querySelector('.vendor-code__id').parentElement.dataset.id;
     this.model.list().then(data => {
       const res = [...data];
-      // this.openModal(id, res);
-      document.addEventListener('click', 
-        this.renderModal(e, 'table__btn_edit', id, data, {}));
+      this.renderModal(e, 'table__btn_edit', id, data, {}), {once : true};
     })
     // const productID = +productList.querySelector('.vendor-code__id').parentElement.dataset.id;
     // const DBIndex = this.products.findIndex(i => i.id === productID);
@@ -56,33 +55,34 @@ export class Controller {
     // this.totalAmount();
     // this.newInc(target);
   }
-  addProduct(el, callback) {
-    const form = document.querySelector('.modal__form');
-    const randomID = Math.floor(Math.random(1) * Date.now());
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();      
-      const formData = new FormData(e.target);
-      const currentID = this.products.length;
-      const addNewItem = Object.fromEntries(formData);
-      addNewItem.id = randomID;
+  
+  // addProduct = async (el, callback) => {
+  //   const form = document.querySelector('.modal__form');
+  //   const randomID = Math.floor(Math.random(1) * Date.now());
+  //   form.addEventListener('submit', async (e) => {
+  //     e.preventDefault();      
+  //     const formData = new FormData(e.target);
+  //     const currentID = this.products.length;
+  //     const addNewItem = Object.fromEntries(formData);
+  //     addNewItem.id = randomID;
       
-      // Add Image
-      addNewItem.image = await this.toBase64(addNewItem.image);
-      // const img = document.createElement('img');
-      // img.src = addNewItem.image;
-      // document.body.append(img);
+  //     // Add Image
+  //     addNewItem.image = await this.toBase64(addNewItem.image);
+  //     // const img = document.createElement('img');
+  //     // img.src = addNewItem.image;
+  //     // document.body.append(img);
     
 
-      this.products.push(addNewItem);
-      console.log(this.products);
+  //     this.products.push(addNewItem);
+  //     console.log(this.products);
       
-      const inc = this.products.length - 1;
-      el.insertAdjacentHTML('beforeend',callback(inc, addNewItem))
-      form.reset();
-      this.totalAmount();
-      this.openProductGallery('#previewImage', addNewItem.image);
-    });
-  }
+  //     const inc = this.products.length - 1;
+  //     el.insertAdjacentHTML('beforeend',callback(inc, addNewItem))
+  //     form.reset();
+  //     this.totalAmount();
+  //     this.openProductGallery('#previewImage', addNewItem.image);
+  //   });
+  // }
 
   openProductGallery(selector, src) {
     const previewImage = document.querySelectorAll(selector);
@@ -164,9 +164,10 @@ export class Controller {
     postImgView.append(preview);
 
     popup.addEventListener('click', e => {
-      e.preventDefault();
+      // e.preventDefault();
       if (e.target.matches('.table__btn_edit')) {
         popup.classList.add('active');
+        document.onmousewheel=stop;
       } if (e.target.matches('.overlay') || e.target.closest('.modal__close')) {
         popup.classList.remove('active');
         // document.querySelector('.img_preview').remove();
@@ -188,8 +189,10 @@ export class Controller {
             fieldset.elements.title.value = el.title;
             fieldset.elements.category.value = el.category;
             fieldset.elements.units.value = el.units;
-            if(el.discount) {
+            if(el.discount > 0) {
               document.querySelector('.modal__checkbox').checked = true;
+            } else {
+              document.querySelector('.modal__checkbox').checked = false;
             }
             fieldset.elements.discount.value = el.discount;
             fieldset.elements.description.value = el.description;
@@ -201,8 +204,22 @@ export class Controller {
         });
       }
     }
+    this.formData(id)
   }
 
+  formData(id) {
+    console.log(id);
+    // Submit updates
+    const form = document.querySelector('.modal__form');
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const renderForm = new FormData(e.target);
+      const data = Object.fromEntries(renderForm);
+      const popup = document.querySelector('.overlay');
+      popup.classList.remove('active');
+      console.log(data);
+    });
+  }
   // openModal(id, data, img) {
   //   const form = document.querySelector('.modal__form');
   //   const popup = document.querySelector('.overlay');

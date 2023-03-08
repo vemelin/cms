@@ -6,11 +6,23 @@ export class Model {
     this.data = data;
   }
 
-  url = (path) => (path) ? `https://cms-yyk5.onrender.com/${path}` :
+  url = (path, id) => 
+    (path) ? `https://cms-yyk5.onrender.com/${path}` :
+    (id) ? `https://cms-yyk5.onrender.com/api/goods/${id}` :
     `https://cms-yyk5.onrender.com/api/goods`;
 
   list = async () =>
     await (await fetch(this.url())).json();
+
+  update = async (id, data, path) => {
+    fetch (this.url(id), {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+  }
 
   // dataList() {
   //   const url = `https://cms-yyk5.onrender.com/api/goods`;

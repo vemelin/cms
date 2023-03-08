@@ -8,7 +8,7 @@ export class View {
     this.controller.openProductGallery('#previewImage');
     // this.controller.openModal();
     // this.openModal();
-    this.controller.addProduct(this.$el, this.createRow);
+    // this.controller.addProduct(this.$el, this.createRow);
   }
   render() {
     const modalOverlay = document.querySelector('.overlay');
