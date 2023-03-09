@@ -11,8 +11,14 @@ export class Model {
     (id) ? `https://cms-yyk5.onrender.com/api/goods/${id}` :
     `https://cms-yyk5.onrender.com/api/goods`;
 
-  list = async () =>
-    await (await fetch(this.url())).json();
+  list = async (callback) => {
+    const res = await fetch(this.url());
+    if (res.ok) {
+      const data = await res.json();
+      // if (callback) return callback(null, data);
+      return data;
+    }
+  }
 
   update = async (id, data, path) => {
     fetch (this.url(id), {

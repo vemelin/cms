@@ -46,7 +46,7 @@ export class Controller {
       .querySelector('.vendor-code__id').parentElement.dataset.id;
     this.model.list().then(data => {
       const res = [...data];
-      this.renderModal(e, 'table__btn_edit', id, data, {}), {once : true};
+      this.renderModal(e, id, data, {});
     })
     // const productID = +productList.querySelector('.vendor-code__id').parentElement.dataset.id;
     // const DBIndex = this.products.findIndex(i => i.id === productID);
@@ -136,7 +136,7 @@ export class Controller {
     reader.readAsDataURL(file);
   })
 
-  renderModal(e, selector, id, data, img) {
+  renderModal(e, id, data, img) {
     const popup = document.querySelector('.overlay');
 
     const popupAmount = document.querySelector('.modal__total-price');
@@ -182,7 +182,7 @@ export class Controller {
       }
     });
 
-    { // Identify the data by ID and pull up the data
+    { // Identify the data by ID and pull up the data into the modal's form fields
       if(data && id) {
         data.map(el => {
           if(el.id === id) {
