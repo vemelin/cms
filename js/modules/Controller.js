@@ -5,7 +5,18 @@ export class Controller {
     this.model = options.model;
     this.totalAmount();
     this.removeProduct();
+    this.image = new Image();
     // this.formData()
+
+    // Preview Image
+    const fieldset = document.querySelector('.modal__fieldset')
+
+    const postImgView = document.createElement('fieldset');
+    postImgView.style.cssText = `text-align: center; display: block;`;
+    postImgView.classList.add('modal__fieldset');
+    postImgView.classList.add('img_preview');
+    fieldset.after(postImgView)
+
   }
   newInc(target){
     let inc = 0;
@@ -137,7 +148,9 @@ export class Controller {
   })
 
   renderModal(e, id, data, img) {
+    document.body.scroll = "no"
     const popup = document.querySelector('.overlay');
+    const fieldset = document.querySelector('.modal__fieldset')
 
     const popupAmount = document.querySelector('.modal__total-price');
     // this.clearDiscountField();
@@ -149,20 +162,6 @@ export class Controller {
     const modalBtn = document.querySelector('.modal__submit');
     modalBtn.textContent = 'Сохранить Товар';
 
-    // Preview Image
-    const fieldset = document.querySelector('.modal__fieldset')
-    const preview = document.createElement('img');
-    const postImgView = document.createElement('fieldset');
-    postImgView.style.cssText = `
-      text-align: center;
-      display: block;
-    `;
-    preview.style.cssText = `width: 50%;`;
-    postImgView.classList.add('modal__fieldset');
-    postImgView.classList.add('img_preview');
-    fieldset.after(postImgView)
-    postImgView.append(preview);
-
     popup.addEventListener('click', e => {
       // e.preventDefault();
       if (e.target.matches('.table__btn_edit')) {
@@ -171,16 +170,10 @@ export class Controller {
       } if (e.target.matches('.overlay') || e.target.closest('.modal__close')) {
         popup.classList.remove('active');
         // document.querySelector('.img_preview').remove();
-        postImgView.remove();
       }
     });
 
-    document.addEventListener('keyup', e => {
-      if (e.key === "Escape") {
-        postImgView.remove();
-        popup.classList.remove('active');
-      }
-    });
+    document.addEventListener('keyup', e => (e.key === "Escape") ? popup.classList.remove('active') : 0);
 
     { // Identify the data by ID and pull up the data into the modal's form fields
       if(data && id) {
@@ -198,13 +191,15 @@ export class Controller {
             fieldset.elements.description.value = el.description;
             fieldset.elements.price.value = el.price;
             fieldset.elements.count.value = el.count;
-            preview.src = this.model.url(el.image);
+            this.image.src = this.model.url(el.image);
+            document.querySelector('.img_preview').append(this.image);
+            document.querySelector('.img_preview img').style.cssText = `width: 50%;`;
             document.querySelector('.vendor-code__wrapper').innerText = `id: ${id}`;
           }
         });
       }
     }
-    this.formData(id)
+    this.formData(id);
   }
 
   formData(id) {
@@ -218,6 +213,7 @@ export class Controller {
       const popup = document.querySelector('.overlay');
       popup.classList.remove('active');
       console.log(data);
+      this.model.update(id, data);
     });
   }
   // openModal(id, data, img) {
