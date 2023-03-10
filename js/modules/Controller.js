@@ -18,6 +18,17 @@ export class Controller {
     fieldset.after(postImgView)
 
   }
+  search(callback) {
+    const input = document.querySelector('.panel__input');
+    input.addEventListener('input', e => {
+      const rx = new RegExp(input.value, 'i');
+      this.model.fetchRequest(`goods?search=${input.value}`, {
+        method: 'get',
+        callback: callback,
+      })
+    })
+
+  }
   newInc(target){
     let inc = 0;
     const getTd = document.querySelectorAll('.goods__table .inc');
@@ -67,33 +78,33 @@ export class Controller {
     // this.newInc(target);
   }
   
-  // addProduct = async (el, callback) => {
-  //   const form = document.querySelector('.modal__form');
-  //   const randomID = Math.floor(Math.random(1) * Date.now());
-  //   form.addEventListener('submit', async (e) => {
-  //     e.preventDefault();      
-  //     const formData = new FormData(e.target);
-  //     const currentID = this.products.length;
-  //     const addNewItem = Object.fromEntries(formData);
-  //     addNewItem.id = randomID;
+  addProduct = async (el, callback) => {
+    const form = document.querySelector('.modal__form');
+    const randomID = Math.floor(Math.random(1) * Date.now());
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();      
+      const formData = new FormData(e.target);
+      const currentID = this.products.length;
+      const addNewItem = Object.fromEntries(formData);
+      addNewItem.id = randomID;
       
-  //     // Add Image
-  //     addNewItem.image = await this.toBase64(addNewItem.image);
-  //     // const img = document.createElement('img');
-  //     // img.src = addNewItem.image;
-  //     // document.body.append(img);
+      // Add Image
+      addNewItem.image = await this.toBase64(addNewItem.image);
+      // const img = document.createElement('img');
+      // img.src = addNewItem.image;
+      // document.body.append(img);
     
 
-  //     this.products.push(addNewItem);
-  //     console.log(this.products);
+      this.products.push(addNewItem);
+      console.log(this.products);
       
-  //     const inc = this.products.length - 1;
-  //     el.insertAdjacentHTML('beforeend',callback(inc, addNewItem))
-  //     form.reset();
-  //     this.totalAmount();
-  //     this.openProductGallery('#previewImage', addNewItem.image);
-  //   });
-  // }
+      const inc = this.products.length - 1;
+      el.insertAdjacentHTML('beforeend',callback(inc, addNewItem))
+      form.reset();
+      this.totalAmount();
+      this.openProductGallery('#previewImage', addNewItem.image);
+    });
+  }
 
   openProductGallery(selector, src) {
     const previewImage = document.querySelectorAll(selector);
@@ -216,75 +227,75 @@ export class Controller {
       this.model.update(id, data);
     });
   }
-  // openModal(id, data, img) {
-  //   const form = document.querySelector('.modal__form');
-  //   const popup = document.querySelector('.overlay');
-  //   const modal = document.querySelector('.overlay__modal');
+  openModal(id, data, img) {
+    const form = document.querySelector('.modal__form');
+    const popup = document.querySelector('.overlay');
+    const modal = document.querySelector('.overlay__modal');
 
-  //   document.addEventListener('click', e => {            
-  //     const popupAmount = document.querySelector('.modal__total-price');
-  //     this.clearDiscountField();
-  //     this.setFormFieldType();
-  //     if (e.target.matches('.panel__add-goods')) {
-  //       popup.classList.add('active');
-  //     } if (e.target.matches('.overlay') || e.target.closest('.modal__close')) {
-  //       popup.classList.remove('active');
-  //     }
-  //     if(e.target.type === 'number') {
-  //       document.addEventListener('change', () => {
-  //         const dis = form.discount;
-  //         const qty = form.count;
-  //         const price = form.price;
-  //         const totalAmount = Math.floor(qty.value * price.value  * (1 - dis.value/100));
-  //         popupAmount.textContent = `$ ${totalAmount}.00`;
-  //       })
-  //     } if (e.target.matches('.modal__submit') && price.value > 0) {
-  //       popup.classList.remove('active');
-  //     }
-  //   });
+    document.addEventListener('click', e => {            
+      const popupAmount = document.querySelector('.modal__total-price');
+      this.clearDiscountField();
+      this.setFormFieldType();
+      if (e.target.matches('.panel__add-goods')) {
+        popup.classList.add('active');
+      } if (e.target.matches('.overlay') || e.target.closest('.modal__close')) {
+        popup.classList.remove('active');
+      }
+      if(e.target.type === 'number') {
+        document.addEventListener('change', () => {
+          const dis = form.discount;
+          const qty = form.count;
+          const price = form.price;
+          const totalAmount = Math.floor(qty.value * price.value  * (1 - dis.value/100));
+          popupAmount.textContent = `$ ${totalAmount}.00`;
+        })
+      } if (e.target.matches('.modal__submit') && price.value > 0) {
+        popup.classList.remove('active');
+      }
+    });
 
-  //   { // Identify the data by ID and pull up the data
-  //     const fieldset = document.querySelector('.modal__fieldset')
+    { // Identify the data by ID and pull up the data
+      const fieldset = document.querySelector('.modal__fieldset')
       
-  //     if(data && id) {
-  //       data.map(el => {
-  //         if(el.id === id) {
-  //           fieldset.elements.title.value = el.title;
-  //           console.log(el);
-  //         }
-  //       });
-  //     }
-  //     // console.log(fieldset.elements);
-  //     // elements.namedItem("fname").value;
-  //   }
+      if(data && id) {
+        data.map(el => {
+          if(el.id === id) {
+            fieldset.elements.title.value = el.title;
+            console.log(el);
+          }
+        });
+      }
+      // console.log(fieldset.elements);
+      // elements.namedItem("fname").value;
+    }
 
 
-  //   // Attach / Render Image
-  //   const file = document.querySelector('.modal__file');
-  //   const preview = document.createElement('img');
-  //   const fieldset = document.querySelector('.modal__fieldset')
-  //   const postImgView = document.createElement('fieldset');
-  //   postImgView.style.cssText = `
-  //     text-align: center;
-  //   `;
+    // Attach / Render Image
+    const file = document.querySelector('.modal__file');
+    const preview = document.createElement('img');
+    const fieldset = document.querySelector('.modal__fieldset')
+    const postImgView = document.createElement('fieldset');
+    postImgView.style.cssText = `
+      text-align: center;
+    `;
 
-  //   file.addEventListener('change', async () => {
-  //     if(file.files[0].size > 1024 * 1024) {
-  //       const h3 = document.createElement('h3');
-  //       h3.textContent = `Изображение не должно превышать размер 1 Мб`.toUpperCase();
-  //       h3.style.cssText = `color: red; font-weight: bold; text-align: center; padding-top: 10px`;
-  //       return fieldset.append(h3);
-  //     }
-  //     if(file.files.length > 0) {
-  //       postImgView.classList.add('modal__fieldset');
-  //       fieldset.after(postImgView)
-  //       postImgView.append(preview);
-  //       const src = URL.createObjectURL(file.files[0]);
-  //       preview.src = src;
-  //       preview.style.display = 'block';
-  //       const res = await this.toBase64(file.files[0]);
-  //     }
-  //   });
+    file.addEventListener('change', async () => {
+      if(file.files[0].size > 1024 * 1024) {
+        const h3 = document.createElement('h3');
+        h3.textContent = `Изображение не должно превышать размер 1 Мб`.toUpperCase();
+        h3.style.cssText = `color: red; font-weight: bold; text-align: center; padding-top: 10px`;
+        return fieldset.append(h3);
+      }
+      if(file.files.length > 0) {
+        postImgView.classList.add('modal__fieldset');
+        fieldset.after(postImgView)
+        postImgView.append(preview);
+        const src = URL.createObjectURL(file.files[0]);
+        preview.src = src;
+        preview.style.display = 'block';
+        const res = await this.toBase64(file.files[0]);
+      }
+    });
     
-  // }
+  }
 }

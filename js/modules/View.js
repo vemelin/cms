@@ -6,11 +6,13 @@ export class View {
     this.model = select.model;
     this.render();
     this.controller.openProductGallery('#previewImage');
+    this.controller.search(this.createRow);
     // this.controller.openModal();
     // this.openModal();
     // this.controller.addProduct(this.$el, this.createRow);
   }
   render() {
+    // this.search(this.createRow(null, data));
     const modalOverlay = document.querySelector('.overlay');
       modalOverlay.classList.toggle('active');
     //Rewriting rows and pull them up from the new JSON data
