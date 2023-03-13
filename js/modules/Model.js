@@ -1,71 +1,70 @@
-import data from "../goods.json" assert { type: "json" };
-
 export class Model {
   constructor(selector) {
     this.model = selector;
-    this.data = data;
-    this.category().then(data => {
-      data.map(i => console.log(i))
-    })
   }
 
-  url = (path, id, category, search) => 
+  url = (path, id) => 
     (path) ? `https://cms-yyk5.onrender.com/${path}` :
     (id) ? `https://cms-yyk5.onrender.com/api/goods/${id}` :
     `https://cms-yyk5.onrender.com/api/goods`;
 
-  list = async () =>
-    await (await fetch(this.url())).json();
+  list = async (callback) => {
+    const response = await fetch(this.url());
+    if(response.ok) {
+      const data = await response.json();
+      if(callback) callback(data);
+      if(callback(data)) {
+        document.querySelector('.spinner').innerHTML = '';
+        document.querySelector('.spinner').style = '';
+      };
+      return;
+    }
+  };
 
-  category = async (category) =>
+  // list = async callback => {
+  //   const data = await (await fetch(this.url())).json();
+  //   return callback([...data]);
+  // }
+
+  category = async () =>
     await (await fetch('https://cms-yyk5.onrender.com/api/category')).json();
 
+  search = async (postfix, {callback}) => {
+    try {
+      const response = await fetch(`${this.url()}?search=${postfix}`, {
+        method: 'get',
+        headers: {'Content-Type': 'application/json'}
+      });
+      if(response.ok) {
+        const data = await response.json();
+        if(callback) callback(data);
+        if(callback(data)) {
+          document.querySelector('.spinner').innerHTML = '';
+          document.querySelector('.spinner').style = '';
+        };
+        if(data.length === 0) {
+          const table = document.querySelector('.table__body')
+          table.innerHTML = `<div class="search__results"><h3>По вашему запросу ничего не найдено</h3></div>`;
+          document.querySelector('.search__results').style.cssText = `
+            margin: auto 0px; padding: 50px 0px; text-align: center;
+          `;
+        }
+        return;
+      }
+    } catch(err) {
+      console.warn(err);
+      if(err) console.warn(err);
+    }
+  }
+
   update = async (id, data, path) => {
-    fetch (this.url(null, id), {
+    const response = await fetch (this.url(null, id), {
       method: 'PATCH',
       body: JSON.stringify(data),
       headers: {
         'Content-Type': 'application/json',
       }
     })
+    if(response.ok) location.reload();
   }
-
-  fetchRequest = async (postfix, {
-    method = 'get',
-    callback,
-    body,
-    headers,
-  }) => {
-    try {
-      const options = {
-        method,
-        headers: {
-          'X-Api-Key': '61e6d0e89cb240c8b1137b5e2cfa16be',
-        },
-      };
-      if (body) options.body = JSON.stringify(body);
-      // if (headers) options.headers = headers;
-      if (headers) options.headers = headers;
-      let response = await fetch(defaultURL, options);
-      if(postfix) {
-        response = await fetch(`${URL}${postfix}`, options);
-      }
-      if (response.ok) {
-        const data = await response.json();
-        if (callback) return callback(null, data);
-        return;
-      }
-      throw new Error(`Ошибка ${response.status}: ${response.statusText}`);
-    } catch (err) {
-      return callback(err);
-    }
-  }
-
-  // dataList() {
-  //   const url = `https://cms-yyk5.onrender.com/api/goods`;
-  //   const data = fetch(url)
-  //     .then(res => res.json())
-  //     .then(data => data.map(i => console.log(i)))
-  //     .catch(err => console.warn(err));
-  // }
 }
