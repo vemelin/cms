@@ -8,7 +8,8 @@ export class View {
     this.$el.innerText = '';
     this.controller.search(this.createRow)
     this.model.list(this.createRow)
-    this.controller.addProduct(this.createRow)
+    // this.controller.addProduct()
+    this.controller.openModal()
   }
   spinner(data) {
     const spinner = document.createElement('div');
@@ -82,9 +83,18 @@ export class View {
     cta.forEach(el => {
       el.addEventListener('click', e => {
         if(e.target.matches('.table__btn_edit')) {
+          this.controller.openModal();
           this.controller.editProductModal(e, arr);
+          const imgArr = document.querySelectorAll('.img_preview img');
+          const errMsg = document.querySelector('.error_limits_message');
+          if (errMsg) errMsg.remove();
+          if (imgArr.length === 2) imgArr[0].remove();
           this.controller.categoryList();
         }
+        if(e.target.matches('.table__btn_del')) {
+          this.controller.removeProduct(e);
+        }
+        
       })
     });
 

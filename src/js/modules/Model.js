@@ -18,13 +18,10 @@ export class Model {
         document.querySelector('.spinner').style = '';
       };
       return;
-    }
+    };
   };
 
-  // list = async callback => {
-  //   const data = await (await fetch(this.url())).json();
-  //   return callback([...data]);
-  // }
+  modalPreview = async () => await (await fetch(this.url())).json();
 
   category = async () =>
     await (await fetch('https://cms-yyk5.onrender.com/api/category')).json();
@@ -57,9 +54,23 @@ export class Model {
     }
   }
 
-  update = async (id, data, path) => {
+  addData = async (data) => {
+    try {
+      const response = await fetch(this.url(), {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {'Content-Type': 'application/json'},
+      });
+      if(response.ok) location.reload();
+    } catch(err) {
+      console.warn(err);
+      if(err) console.warn(err);
+    }
+  }
+
+  update = async (id, data, action) => {
     const response = await fetch (this.url(null, id), {
-      method: 'PATCH',
+      method: action,
       body: JSON.stringify(data),
       headers: {
         'Content-Type': 'application/json',
