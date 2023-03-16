@@ -6,10 +6,9 @@ export class View {
     this.products = select.model.data;
     this.model = select.model;
     this.$el.innerText = '';
+    // this.controller.addProduct();
     this.controller.search(this.createRow)
     this.model.list(this.createRow)
-    // this.controller.addProduct()
-    this.controller.openModal()
   }
   spinner(data) {
     const spinner = document.createElement('div');
@@ -42,6 +41,10 @@ export class View {
       modalOverlay.classList.toggle('active');
     // Spinner
     this.spinner();
+    const addBtn = document.querySelector('.panel__add-goods');
+    addBtn.addEventListener('click', e => {
+      this.controller.addProduct(e);
+    })
   }
   createRow = (arr) => {
     const imgUrl = `https://cms-yyk5.onrender.com/`;
@@ -85,10 +88,10 @@ export class View {
         if(e.target.matches('.table__btn_edit')) {
           this.controller.openModal();
           this.controller.editProductModal(e, arr);
-          const imgArr = document.querySelectorAll('.img_preview img');
+          // const imgArr = document.querySelectorAll('.img_preview img');
           const errMsg = document.querySelector('.error_limits_message');
           if (errMsg) errMsg.remove();
-          if (imgArr.length === 2) imgArr[0].remove();
+          // if (imgArr.length === 2) imgArr[0].remove();
           this.controller.categoryList();
         }
         if(e.target.matches('.table__btn_del')) {

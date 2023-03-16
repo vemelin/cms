@@ -13,8 +13,8 @@ export class Controller {
     this.imgPreview.classList.add('modal__fieldset');
     this.imgPreview.classList.add('img_preview');
     this.fieldset.after(this.imgPreview)
-    this.updateImage();
   }
+
   openModal() {
     const popup = document.querySelector('.overlay');
     popup.addEventListener('click', e => {
@@ -25,6 +25,7 @@ export class Controller {
       }
     });
   }
+  
   updateImage () {
     // Attach / Render Image
     const file = document.querySelector('.modal__file');
@@ -35,29 +36,32 @@ export class Controller {
       text-align: center;
       display: block;
     `;
-    if(file.files.length === 1) this.fieldset.remove();
+
     file.addEventListener('change', (e) => {
-      console.log(file.files);
+      const errMsg = document.querySelector('.error_limits_message');
+      if(errMsg) errMsg.remove();
+
+      if (file.files.length > 0) {
+        postImgView.classList.add('modal__fieldset');
+        fieldset.after(postImgView)
+        const currentView = document.querySelector('.img_preview')
+        postImgView.remove();
+        currentView.innerHTML = ''
+        currentView.append(preview)
+        preview.src = URL.createObjectURL(file.files[0])
+      }
+
       if(file.files[0].size > 1024 * 1024) {
         const h3 = document.createElement('h3');
         h3.textContent = `Изображение не должно превышать размер 1 Мб`.toUpperCase();
         h3.style.cssText = `color: red; font-weight: bold; text-align: center; padding-top: 10px`;
         h3.classList.add('error_limits_message');
         this.fieldset.append(h3);
-      }
-      if(file.files.length > 0) {
-        postImgView.classList.add('modal__fieldset');
-        fieldset.after(postImgView)
-        // postImgView.append(preview);
-        const currentView = document.querySelector('.img_preview')
-        postImgView.remove();
-        currentView.innerHTML = ''
-        currentView.append(preview)
-        preview.src = URL.createObjectURL(file.files[0])
-        // const res = await this.toBase64(file.files[0]);
+        return;
       }
     });
   }
+
   debounceSearch = (callback, msec) => {
     let lastCall = 0, lastCallTimer = NaN;
     return (...args) => {
@@ -100,24 +104,27 @@ export class Controller {
     this.model.modalPreview().then(data => data.map(el => {
       if(el.id === id) {
         const msg = confirm(`Вы хотите удалить "${el.title}"?`);
-        if (msg) this.model.update(id, null, 'DELETE');
+        if (msg) this.model.update(id, false, 'DELETE');
       }
     }));
   }
 
   editProductModal(e, data) {
+    
     const id = e.target.closest('tr')
       .querySelector('.table__cell_name').dataset.id
+
+    // Prepoluate Categories
+    this.categoryList();
 
     // Empty Image Text placeholder
     document.querySelector('.img_preview').textContent = '';
 
     const popup = document.querySelector('.overlay');
-    const popupAmount = document.querySelector('.modal__total-price');
-    // this.clearDiscountField();
-    // this.setFormFieldType();
     
-    if (e.target.matches('.table__btn_edit')) popup.classList.add('active');
+    if (e.target.matches('.table__btn_edit')) {
+      popup.classList.add('active');
+    }
 
     //Change text from add product to save
     const modalBtn = document.querySelector('.modal__submit');
@@ -149,10 +156,10 @@ export class Controller {
         });
       }
     }
-    this.formData(id);
-  }
 
-  formData(id) {
+    // Attach / Render Image
+    this.updateImage()
+
     // Submit updates
     const form = document.querySelector('.modal__form');
     form.addEventListener('submit', async e => {
@@ -162,35 +169,53 @@ export class Controller {
       const popup = document.querySelector('.overlay');
       popup.classList.remove('active');
       const file = document.querySelector('.modal__file');
-
       if (file.files.length > 0) {
         data.image = await this.toBase64(file.files[0]);
-        console.log('new image');
+        if(file.files[0].size > 1024 * 1024) {
+          console.log('oversize');
+          return
+        } else if (file.files[0].size === undefined) return data, console.log('oversize');
       } else {
-        return data, location.reload()
+        data.image = `image/${id}.jpg`
+        return this.model.update(id, data, 'PATCH');
       }
-
-      // Send request to Update Data
       this.model.update(id, data, 'PATCH');
     });
+
+    const popupAmount = document.querySelector('.modal__total-price');
+    const dis = form.discount;
+    const qty = form.count;
+    const price = form.price;
+    const totalAmount = Math.floor(qty.value * price.value  * (1 - dis.value/100));
+    popupAmount.textContent = `$ ${totalAmount}.00`;
+
   }
   
-  openModal() {
-    const form = document.querySelector('.modal__form');
+  addProduct(e) {
     const popup = document.querySelector('.overlay');
-    const modal = document.querySelector('.overlay__modal');
+    const form = document.querySelector('.modal__form');
 
-    document.addEventListener('click', e => {            
+    // Prepoluate Categories
+    this.categoryList();
+
+    document.addEventListener('keyup', e => (e.key === "Escape") ? 
+      popup.classList.remove('active') : 0);
+
+    document.addEventListener('click', e => {
       const popupAmount = document.querySelector('.modal__total-price');
+
       this.clearDiscountField();
       this.setFormFieldType();
+      
       if (e.target.matches('.panel__add-goods')) {
-        form.reset();
+        form.reset()
         //Change text from add product to save
         const modalBtn = document.querySelector('.modal__submit');
         modalBtn.textContent = 'Добавить Товар';
         const imgPreview = document.querySelector('.img_preview');
         imgPreview.innerHTML = '<h3>Картинка</h3>'
+        const errMsg = document.querySelector('.error_limits_message');
+        if(errMsg) errMsg.remove();
         popup.classList.add('active');
       } if (e.target.matches('.overlay') || e.target.closest('.modal__close')) {
         popup.classList.remove('active');
@@ -206,41 +231,10 @@ export class Controller {
       } if (e.target.matches('.modal__submit') && price.value > 0) {
         popup.classList.remove('active');
       }
-    });
-
-    // { // Identify the data by ID and pull up the data
-    //   const fieldset = document.querySelector('.modal__fieldset')
-    //   if(data && id) {
-    //     data.map(el => {
-    //       if(el.id === id) {
-    //         fieldset.elements.title.value = el.title;
-    //         console.log(el);
-    //       }
-    //     });
-    //   }
-    // }
-
+    })
 
     // Attach / Render Image
-    const file = document.querySelector('.modal__file');
-    
-    file.addEventListener('change', async () => {
-      if(file.files[0].size > 1024 * 1024) {
-        const h3 = document.createElement('h3');
-        h3.textContent = `Изображение не должно превышать размер 1 Мб`.toUpperCase();
-        h3.style.cssText = `color: red; font-weight: bold; text-align: center; padding-top: 10px`;
-        return fieldset.append(h3);
-      }
-      if(file.files.length > 0) {
-        postImgView.classList.add('modal__fieldset');
-        fieldset.after(postImgView)
-        postImgView.append(preview);
-        const src = URL.createObjectURL(file.files[0]);
-        preview.src = src;
-        preview.style.display = 'block';
-        // const res = await this.toBase64(file.files[0]);
-      }
-    });
+    this.updateImage()
 
     // Submit updates
     form.addEventListener('submit', async e => {
@@ -250,16 +244,13 @@ export class Controller {
       const popup = document.querySelector('.overlay');
       popup.classList.remove('active');
       const file = document.querySelector('.modal__file');
-
+      if(file.files[0].size > 1024 * 1024) return;
       if (file.files.length > 0) {
         data.image = await this.toBase64(file.files[0]);
-        console.log('new image');
-      } else {
-        return data, location.reload()
       }
-      // Send request to Update Data
-      this.model.addData(data);
-    }); 
+      this.model.update(false, data, 'POST');
+    });
+    form.reset();
   }
 
   openProductGallery(selector) {

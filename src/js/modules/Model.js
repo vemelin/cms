@@ -1,6 +1,7 @@
 export class Model {
   constructor(selector) {
     this.model = selector;
+    // this.action = action.
   }
 
   url = (path, id) => 
@@ -52,30 +53,28 @@ export class Model {
       console.warn(err);
       if(err) console.warn(err);
     }
+    return
   }
 
-  addData = async (data) => {
-    try {
-      const response = await fetch(this.url(), {
-        method: 'POST',
+  update = async (id, data, action) => {
+    try { 
+      const response = await fetch(this.url(false, id), {
+        method: action, 
         body: JSON.stringify(data),
-        headers: {'Content-Type': 'application/json'},
-      });
-      if(response.ok) location.reload();
+        headers: {
+          'Content-Type': 'application/json',
+          },
+        });
+      // if(response.ok) location.reload();
+      if(response.ok) {
+        const data = await response.json();
+        return data, location.reload();
+      }
     } catch(err) {
       console.warn(err);
       if(err) console.warn(err);
     }
+    return
   }
 
-  update = async (id, data, action) => {
-    const response = await fetch (this.url(null, id), {
-      method: action,
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    })
-    if(response.ok) location.reload();
-  }
 }
